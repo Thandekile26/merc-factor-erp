@@ -5,6 +5,7 @@ export type Customer = {
   phone: string;
   email: string;
   vehicles: number;
-  lastVisit: string;
   balance: number;
+  company?: string;
+  address?: string;
 };

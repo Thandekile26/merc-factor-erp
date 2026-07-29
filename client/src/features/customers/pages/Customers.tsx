@@ -1,98 +1,81 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import DashboardLayout from "../../../layouts/DashboardLayout";
 import CustomerForm from "../components/CustomerForm";
-
-type Customer = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-};
+import CustomerSearch from "../components/CustomerSearch";
+import CustomerTable from "../components/CustomerTable";
+import { customers as initialCustomers } from "../data";
+import { type Customer } from "../types";
 
 export default function Customers() {
+  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
+  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
 
-  const [customers, setCustomers] = useState<Customer[]>([
-    {
-      id: 1,
-      firstName: "Sipho",
-      lastName: "Dlamini",
-      phone: "082 555 1234",
-      email: "sipho@email.com",
-    },
-    {
-      id: 2,
-      firstName: "Sarah",
-      lastName: "Mokoena",
-      phone: "071 456 7890",
-      email: "sarah@email.com",
-    },
-  ]);
+  function handleAddCustomer(customer: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    company: string;
+    address: string;
+  }) {
+    const newCustomer: Customer = {
+      id: Date.now(),
+      ...customer,
+      vehicles: 0,
+      balance: 0,
+    };
 
-  function addCustomer(customer: Omit<Customer, "id">) {
-    setCustomers([
-      ...customers,
-      {
-        id: Date.now(),
-        ...customer,
-      },
-    ]);
-
+    setCustomers((prev) => [...prev, newCustomer]);
     setShowForm(false);
   }
 
+  const filteredCustomers = useMemo(() => {
+    const value = search.toLowerCase();
+
+    return customers.filter(
+      (customer) =>
+        `${customer.firstName} ${customer.lastName}`
+          .toLowerCase()
+          .includes(value) ||
+        customer.phone.toLowerCase().includes(value) ||
+        customer.email.toLowerCase().includes(value)
+    );
+  }, [customers, search]);
+
   return (
-    <div className="p-8 text-white">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Customers</h1>
-          <p className="text-zinc-400">
-            Manage all workshop customers.
-          </p>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white">
+              Customers
+            </h1>
+
+            <p className="text-zinc-400">
+              Manage all workshop customers.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="rounded-lg bg-yellow-500 px-5 py-3 font-semibold text-black hover:bg-yellow-400"
+          >
+            {showForm ? "Close Form" : "+ Add Customer"}
+          </button>
         </div>
 
-        <button
-          onClick={() => setShowForm(true)}
-          className="rounded-lg bg-yellow-500 px-5 py-3 font-semibold text-black hover:bg-yellow-400"
-        >
-          + Add Customer
-        </button>
+        <CustomerSearch
+          search={search}
+          onSearchChange={setSearch}
+        />
+
+        {showForm && (
+          <CustomerForm onSave={handleAddCustomer} />
+        )}
+
+        <CustomerTable customers={filteredCustomers} />
       </div>
-
-      {showForm && (
-        <div className="mb-8">
-          <CustomerForm onSave={addCustomer} />
-        </div>
-      )}
-
-      <div className="overflow-hidden rounded-xl border border-zinc-800">
-        <table className="w-full">
-          <thead className="bg-zinc-900">
-            <tr>
-              <th className="p-4 text-left">Name</th>
-              <th className="p-4 text-left">Phone</th>
-              <th className="p-4 text-left">Email</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {customers.map((customer) => (
-              <tr
-                key={customer.id}
-                className="border-t border-zinc-800 hover:bg-zinc-900"
-              >
-                <td className="p-4">
-                  {customer.firstName} {customer.lastName}
-                </td>
-
-                <td className="p-4">{customer.phone}</td>
-
-                <td className="p-4">{customer.email}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 }
