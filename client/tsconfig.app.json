@@ -6,7 +6,6 @@
     "lib": ["ES2023", "DOM"],
 
     "module": "ESNext",
-
     "types": ["vite/client"],
 
     "allowArbitraryExtensions": true,
@@ -19,12 +18,12 @@
     "moduleDetection": "force",
     "noEmit": true,
 
+    /* React */
     "jsx": "react-jsx",
 
     /* Paths */
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
-    "paths": {
+  "paths": {
       "@/*": ["src/*"]
     },
 
