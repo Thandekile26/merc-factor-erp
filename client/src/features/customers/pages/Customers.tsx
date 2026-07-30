@@ -1,17 +1,26 @@
 import { useMemo, useState } from "react";
+
 import DashboardLayout from "../../../layouts/DashboardLayout";
 import CustomerForm from "../components/CustomerForm";
 import CustomerSearch from "../components/CustomerSearch";
 import CustomerTable from "../components/CustomerTable";
-import { customers as initialCustomers } from "../data";
-import { type Customer } from "../types";
+import { useCustomers } from "../context/CustomerContext";
+import type { Customer } from "../types";
 
 export default function Customers() {
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
+  const {
+    customers,
+    addCustomer,
+    updateCustomer,
+    deleteCustomer,
+  } = useCustomers();
+
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [editingCustomer, setEditingCustomer] =
+    useState<Customer | null>(null);
 
-  function handleAddCustomer(customer: {
+  function handleSave(customerData: {
     firstName: string;
     lastName: string;
     phone: string;
@@ -19,28 +28,52 @@ export default function Customers() {
     company: string;
     address: string;
   }) {
-    const newCustomer: Customer = {
+    if (editingCustomer) {
+      updateCustomer({
+        ...editingCustomer,
+        ...customerData,
+      });
+
+      setEditingCustomer(null);
+      setShowForm(false);
+      return;
+    }
+
+    addCustomer({
       id: Date.now(),
-      ...customer,
+      ...customerData,
       vehicles: 0,
       balance: 0,
-    };
+    });
 
-    setCustomers((prev) => [...prev, newCustomer]);
     setShowForm(false);
   }
 
-  const filteredCustomers = useMemo(() => {
-    const value = search.toLowerCase();
+  function handleDelete(customer: Customer) {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${customer.firstName} ${customer.lastName}?`
+    );
 
-    return customers.filter(
-      (customer) =>
+    if (confirmed) {
+      deleteCustomer(customer.id);
+    }
+  }
+
+  const filteredCustomers = useMemo(() => {
+    const value = search.toLowerCase().trim();
+
+    return customers.filter((customer) => {
+      return (
         `${customer.firstName} ${customer.lastName}`
           .toLowerCase()
           .includes(value) ||
         customer.phone.toLowerCase().includes(value) ||
-        customer.email.toLowerCase().includes(value)
-    );
+        customer.email.toLowerCase().includes(value) ||
+        (customer.company ?? "")
+          .toLowerCase()
+          .includes(value)
+      );
+    });
   }, [customers, search]);
 
   return (
@@ -58,8 +91,11 @@ export default function Customers() {
           </div>
 
           <button
-            onClick={() => setShowForm(!showForm)}
-            className="rounded-lg bg-yellow-500 px-5 py-3 font-semibold text-black hover:bg-yellow-400"
+            onClick={() => {
+              setEditingCustomer(null);
+              setShowForm(!showForm);
+            }}
+            className="rounded-lg bg-yellow-500 px-5 py-3 font-semibold text-black hover:bg-yellow-400 transition"
           >
             {showForm ? "Close Form" : "+ Add Customer"}
           </button>
@@ -71,10 +107,24 @@ export default function Customers() {
         />
 
         {showForm && (
-          <CustomerForm onSave={handleAddCustomer} />
+          <CustomerForm
+            initialData={editingCustomer ?? undefined}
+            onSave={handleSave}
+            onCancel={() => {
+              setEditingCustomer(null);
+              setShowForm(false);
+            }}
+          />
         )}
 
-        <CustomerTable customers={filteredCustomers} />
+        <CustomerTable
+          customers={filteredCustomers}
+          onEdit={(customer) => {
+            setEditingCustomer(customer);
+            setShowForm(true);
+          }}
+          onDelete={handleDelete}
+        />
       </div>
     </DashboardLayout>
   );

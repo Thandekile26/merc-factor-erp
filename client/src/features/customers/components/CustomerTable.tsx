@@ -1,11 +1,21 @@
+import { useNavigate } from "react-router-dom";
 import { type Customer } from "../types";
 import CustomerActions from "./CustomerActions";
+import { formatCurrency } from "../../../lib/currency";
 
 type Props = {
   customers: Customer[];
+  onEdit: (customer: Customer) => void;
+  onDelete: (customer: Customer) => void;
 };
 
-export default function CustomerTable({ customers }: Props) {
+export default function CustomerTable({
+  customers,
+  onEdit,
+  onDelete,
+}: Props) {
+  const navigate = useNavigate();
+
   if (customers.length === 0) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-10 text-center text-zinc-400">
@@ -31,7 +41,7 @@ export default function CustomerTable({ customers }: Props) {
           {customers.map((customer) => (
             <tr
               key={customer.id}
-              className="border-t border-zinc-800 hover:bg-zinc-800 transition"
+              className="border-t border-zinc-800 transition hover:bg-zinc-800"
             >
               <td className="p-4">
                 <div className="font-semibold">
@@ -48,18 +58,17 @@ export default function CustomerTable({ customers }: Props) {
               <td className="p-4">{customer.vehicles}</td>
 
               <td className="p-4 font-medium">
-                {new Intl.NumberFormat("en-ZA", {
-                  style: "currency",
-                  currency: "ZAR",
-                }).format(customer.balance)}
+                {formatCurrency(customer.balance)}
               </td>
 
               <td className="p-4">
                 <div className="flex justify-center">
                   <CustomerActions
-                    onView={() => console.log("View", customer.id)}
-                    onEdit={() => console.log("Edit", customer.id)}
-                    onDelete={() => console.log("Delete", customer.id)}
+                    onView={() =>
+                      navigate(`/customers/${customer.id}`)
+                    }
+                    onEdit={() => onEdit(customer)}
+                    onDelete={() => onDelete(customer)}
                   />
                 </div>
               </td>

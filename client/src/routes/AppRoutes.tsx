@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard";
 import Customers from "../features/customers/pages/Customers";
-
+import CustomerDetails from "../features/customers/pages/CustomerDetails";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -24,6 +24,11 @@ export default function AppRoutes() {
       <Route path="/inspections" element={<h1>Inspections</h1>} />
 <Route path="/parts" element={<h1>Parts</h1>} />
 <Route path="/suppliers" element={<h1>Suppliers</h1>} />
+<Route
+  path="/customers/:id"
+  element={<CustomerDetails />}
+/>
+
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
