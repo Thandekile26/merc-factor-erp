@@ -23,7 +23,8 @@
 
     /* Paths */
     "baseUrl": ".",
-  "paths": {
+    "ignoreDeprecations": "6.0",
+    "paths": {
       "@/*": ["src/*"]
     },
 
@@ -34,5 +35,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
+
   "include": ["src"]
 }

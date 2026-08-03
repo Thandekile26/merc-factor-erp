@@ -1,19 +1,27 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard";
+
 import Customers from "../features/customers/pages/Customers";
 import CustomerDetails from "../features/customers/pages/CustomerDetails";
+import JobCards from "../features/jobCards/pages/JobCards";
+
+import Vehicles from "../features/vehicles/pages/Vehicles";
+
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/customers" element={<Customers />} />
 
-      {/* Future modules */}
-      <Route path="/vehicles" element={<h1>Vehicles</h1>} />
-      <Route path="/job-cards" element={<h1>Job Cards</h1>} />
+      <Route path="/customers" element={<Customers />} />
+      <Route path="/customers/:id" element={<CustomerDetails />} />
+
+      <Route path="/vehicles" element={<Vehicles />} />
+
+      <Route path="/job-cards" element={<JobCards />} />
+      <Route path="/inspections" element={<h1>Inspections</h1>} />
       <Route path="/quotes" element={<h1>Quotes</h1>} />
       <Route path="/invoices" element={<h1>Invoices</h1>} />
       <Route path="/payments" element={<h1>Payments</h1>} />
@@ -21,14 +29,8 @@ export default function AppRoutes() {
       <Route path="/employees" element={<h1>Employees</h1>} />
       <Route path="/reports" element={<h1>Reports</h1>} />
       <Route path="/settings" element={<h1>Settings</h1>} />
-      <Route path="/inspections" element={<h1>Inspections</h1>} />
-<Route path="/parts" element={<h1>Parts</h1>} />
-<Route path="/suppliers" element={<h1>Suppliers</h1>} />
-<Route
-  path="/customers/:id"
-  element={<CustomerDetails />}
-/>
-
+      <Route path="/parts" element={<h1>Parts</h1>} />
+      <Route path="/suppliers" element={<h1>Suppliers</h1>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
